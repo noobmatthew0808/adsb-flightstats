@@ -31,7 +31,7 @@ def build(output):
             raise SystemExit(f"Refusing symlink: {relative}")
         if not path.is_file() or output == path or output in path.parents:
             continue
-        if path.suffix in {".db", ".sqlite", ".sqlite3", ".pyc", ".zip", ".log"} or path.name.startswith(".env"):
+        if path.suffix in {".db", ".sqlite", ".sqlite3", ".pyc", ".zip", ".log", ".tsbuildinfo"} or path.name.startswith(".env"):
             continue
         files.append((path, relative))
     manifest = {str(relative): hashlib.sha256(path.read_bytes()).hexdigest() for path, relative in files}
