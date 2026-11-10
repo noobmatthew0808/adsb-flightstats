@@ -1,0 +1,23 @@
+[Unit]
+Description=Airspace Analytics read-only dashboard
+After=network.target airspace-analytics-updater.service
+
+[Service]
+Type=simple
+WorkingDirectory=@WORKING_DIRECTORY@
+EnvironmentFile="@ROOT@/environment"
+ExecStart="@ROOT@/current/.venv/bin/python" -m uvicorn backend.app:app --host 0.0.0.0 --port @PORT@
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+UMask=0077
+PrivateTmp=yes
+PrivateUsers=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadOnlyPaths=-/opt/aerodrome
+ReadWritePaths="@ROOT@/state"
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=default.target

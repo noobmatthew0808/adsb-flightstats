@@ -1,0 +1,24 @@
+[Unit]
+Description=Airspace Analytics scoped release updater
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=@WORKING_DIRECTORY@
+EnvironmentFile="@ROOT@/environment"
+ExecStart="@ROOT@/current/.venv/bin/python" -m backend.updater_service --root "@ROOT@"
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=yes
+UMask=0077
+PrivateTmp=yes
+PrivateUsers=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths="@ROOT@"
+ReadOnlyPaths=-/opt/aerodrome
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+
+[Install]
+WantedBy=default.target

@@ -1,0 +1,11 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {londonEpoch,londonInput,windowFor} from '../src/time.ts';
+const base={metric:'aircraft',preset:'custom',duration:'46',unit:'hours',start:'2026-03-29T00:00',end:'2026-03-30T00:00',group:'hour',stat:'count',session_gap:30};
+test('London spring day contains 23 elapsed hours',()=>{const [s,e]=windowFor(base);assert.equal(e-s,23*3600);});
+test('London autumn day contains 25 elapsed hours',()=>{const [s,e]=windowFor({...base,start:'2026-10-25T00:00',end:'2026-10-26T00:00'});assert.equal(e-s,25*3600);});
+test('nonexistent London spring time is rejected',()=>assert.throws(()=>londonEpoch('2026-03-29T01:30'),/does not exist/));
+test('ambiguous autumn hour offers both real occurrences',()=>{const first=londonEpoch('2026-10-25T01:30','earlier'),second=londonEpoch('2026-10-25T01:30','later');assert.equal(second-first,3600);assert.equal(londonInput(first),'2026-10-25T01:30');assert.equal(londonInput(second),'2026-10-25T01:30');});
+test('custom rolling 46 hours remains exactly 46 elapsed hours across DST',()=>{const [s,e]=windowFor({...base,preset:'rolling'},null,londonEpoch('2026-03-30T12:00'));assert.equal(e-s,46*3600);});
+test('all history begins at real source boundary',()=>{const [s]=windowFor({...base,preset:'all'},{source:{first_seen:12345}},50000);assert.equal(s,12345);});
+test('negative rolling durations are rejected',()=>assert.throws(()=>windowFor({...base,preset:'rolling',duration:'-1'}),/start must be before/));
